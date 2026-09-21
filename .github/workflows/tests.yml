@@ -28,18 +28,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (test repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       # Repositório do app sob teste — se privado, use um PAT no secret APP_REPO_TOKEN
       - name: Checkout (app repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: ${{ github.repository_owner }}/finance-control
           path: finance-control
           token: ${{ secrets.APP_REPO_TOKEN || github.token }}
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -67,7 +67,7 @@ jobs:
 
       - name: Upload reports (API)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-reports-api
           path: |
@@ -86,17 +86,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (test repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout (app repo)
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: ${{ github.repository_owner }}/finance-control
           path: finance-control
           token: ${{ secrets.APP_REPO_TOKEN || github.token }}
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v6
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -126,7 +126,7 @@ jobs:
 
       - name: Upload reports + evidence (Web)
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: test-reports-web
           path: |
