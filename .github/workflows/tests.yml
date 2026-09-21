@@ -1,0 +1,141 @@
+name: QA Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: tests-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # URLs locais (app sobe via docker compose no próprio runner)
+  BASE_URL: http://localhost:5173
+  API_BASE_URL: http://localhost:8080
+  BROWSER: chrome
+  HEADLESS: "true"
+  # Senha sintética dos usuários de teste (não é secret real)
+  DEFAULT_PASSWORD: Passw0rd!123
+  # JWT_SECRET exigido pelo docker-compose do app (>= 32 chars, valor de teste)
+  JWT_SECRET: finance-control-tests-ci-jwt-secret-2026
+
+jobs:
+  api:
+    name: API + Contract
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (test repo)
+        uses: actions/checkout@v4
+
+      # Repositório do app sob teste — se privado, use um PAT no secret APP_REPO_TOKEN
+      - name: Checkout (app repo)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/finance-control
+          path: finance-control
+          token: ${{ secrets.APP_REPO_TOKEN || github.token }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Start finance-control
+        working-directory: finance-control
+        run: |
+          cp -n .env.example .env || true
+          docker compose up --build -d
+          echo 'Aguardando a API...'
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8080/v3/api-docs >/dev/null 2>&1; then
+              echo 'API pronta!'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'API não respondeu a tempo'
+          docker compose logs --tail 40
+          exit 1
+
+      - name: Run API and Contract tests
+        run: mvn clean test -Papi --batch-mode
+
+      - name: Upload reports (API)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-api
+          path: |
+            target/surefire-reports/
+            target/logs/
+          retention-days: 14
+
+      - name: Shutdown app
+        if: always()
+        working-directory: finance-control
+        run: docker compose down -v
+
+  web:
+    name: Web (Selenium)
+    needs: api
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (test repo)
+        uses: actions/checkout@v4
+
+      - name: Checkout (app repo)
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.repository_owner }}/finance-control
+          path: finance-control
+          token: ${{ secrets.APP_REPO_TOKEN || github.token }}
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Start finance-control
+        working-directory: finance-control
+        run: |
+          cp -n .env.example .env || true
+          docker compose up --build -d
+          echo 'Aguardando a API...'
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:8080/v3/api-docs >/dev/null 2>&1; then
+              echo 'API pronta!'
+              exit 0
+            fi
+            sleep 2
+          done
+          echo 'API não respondeu a tempo'
+          docker compose logs --tail 40
+          exit 1
+
+      # Chrome já vem instalado no runner ubuntu-latest; o Selenium Manager
+      # resolve o chromedriver automaticamente.
+      - name: Run Web tests
+        run: mvn clean test -Pweb --batch-mode
+
+      - name: Upload reports + evidence (Web)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports-web
+          path: |
+            target/surefire-reports/
+            target/screenshots/
+            target/logs/
+          retention-days: 14
+
+      - name: Shutdown app
+        if: always()
+        working-directory: finance-control
+        run: docker compose down -v

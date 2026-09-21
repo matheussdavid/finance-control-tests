@@ -1,0 +1,57 @@
+# --- Java / Maven ---
+target/
+*.class
+*.jar
+!.mvn/wrapper/maven-wrapper.jar
+*.war
+*.ear
+*.log
+dependency-reduced-pom.xml
+
+# --- Maven wrapper ---
+.mvn/wrapper/maven-wrapper.properties
+
+# --- IDE IntelliJ ---
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# --- IDE VS Code ---
+.vscode/
+*.code-workspace
+
+# --- Eclipse ---
+.classpath
+.project
+.settings/
+bin/
+
+# --- React/Node (caso o repo hospede algo de front auxiliar) ---
+node_modules/
+dist/
+*.tsbuildinfo
+
+# --- OS ---
+.DS_Store
+Thumbs.db
+
+# --- Ambiente e secrets (nunca versionar) ---
+.env
+.env.local
+*.pem
+!*.p12.example
+
+# --- Relatórios, evidências e temporários ---
+reports/
+target/
+screenshots/
+*.save
+*.orig
+*~
+.attach_*
+
+# --- Logs ---
+logs/
+*.log

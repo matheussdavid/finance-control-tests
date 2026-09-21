@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>br.com.financecontrol</groupId>
+    <artifactId>finance-control-tests</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>finance-control-tests</name>
+    <description>E2E automation for the Finance Control app (Selenium + Rest Assured + JUnit 5)</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.release>21</maven.compiler.release>
+
+        <junit.version>5.11.4</junit.version>
+        <rest-assured.version>5.5.7</rest-assured.version>
+        <jackson.version>2.18.3</jackson.version>
+        <selenium.version>4.47.0</selenium.version>
+        <assertj.version>3.27.7</assertj.version>
+        <datafaker.version>2.4.2</datafaker.version>
+        <dotenv.version>2.3.2</dotenv.version>
+        <slf4j.version>2.0.16</slf4j.version>
+        <logback.version>1.5.18</logback.version>
+        <maven.surefire.version>3.2.5</maven.surefire.version>
+        <maven.compiler.version>3.13.0</maven.compiler.version>
+
+        <surefire.groups/>
+    </properties>
+
+    <dependencies>
+        <!-- Framework de testes -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj.version}</version>
+        </dependency>
+
+        <!-- Testes de API -->
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>rest-assured</artifactId>
+            <version>${rest-assured.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.rest-assured</groupId>
+            <artifactId>json-schema-validator</artifactId>
+            <version>${rest-assured.version}</version>
+        </dependency>
+
+        <!-- Serialização JSON -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>${jackson.version}</version>
+        </dependency>
+
+        <!-- Selenium / Selenium Manager resolve o driver automaticamente -->
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <version>${selenium.version}</version>
+        </dependency>
+
+        <!-- Geração de massa / dados dinâmicos -->
+        <dependency>
+            <groupId>net.datafaker</groupId>
+            <artifactId>datafaker</artifactId>
+            <version>${datafaker.version}</version>
+        </dependency>
+
+        <!-- Carga de .env (sem sobrescrever variáveis de ambiente reais) -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>${dotenv.version}</version>
+        </dependency>
+
+        <!-- Logging (nunca System.out.println) -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${maven.surefire.version}</version>
+                <configuration>
+                    <includes>
+                        <include>**/*Test.java</include>
+                    </includes>
+                    <groups>${surefire.groups}</groups>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-report-plugin</artifactId>
+                <version>${maven.surefire.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <!-- Executa somente os testes marcados com @Tag("smoke") -->
+        <profile>
+            <id>smoke</id>
+            <properties>
+                <surefire.groups>smoke</surefire.groups>
+            </properties>
+        </profile>
+
+        <!-- API + contract -->
+        <profile>
+            <id>api</id>
+            <properties>
+                <surefire.groups>api|contract</surefire.groups>
+            </properties>
+        </profile>
+
+        <!-- Somente testes web -->
+        <profile>
+            <id>web</id>
+            <properties>
+                <surefire.groups>web</surefire.groups>
+            </properties>
+        </profile>
+
+        <!-- Somente testes de contrato -->
+        <profile>
+            <id>contract</id>
+            <properties>
+                <surefire.groups>contract</surefire.groups>
+            </properties>
+        </profile>
+
+        <!-- Fluxos E2E (web + api) -->
+        <profile>
+            <id>e2e</id>
+            <properties>
+                <surefire.groups>e2e</surefire.groups>
+            </properties>
+        </profile>
+    </profiles>
+</project>
