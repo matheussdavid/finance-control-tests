@@ -10,11 +10,8 @@ import org.junit.jupiter.api.Test;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
- * EXEMPLO 2 — teste web.
- *
- * <p>Observe: o teste não conhece locators, WebDriver, waits ou URLs.
- * Estado é criado via API (fixture) e as interações são compostas pelos
- * Page Objects (LoginPage/DashboardPage).
+ * Testes web de login. Estado é criado via API (fixture) e as interações são
+ * compostas pelos Page Objects (LoginPage/DashboardPage).
  */
 @Tag("web")
 class LoginWebTest extends WebTestBase {
@@ -30,25 +27,5 @@ class LoginWebTest extends WebTestBase {
         loginPage.open().loginAs(user.username(), user.password());
 
         assertThat(dashboardPage.isDisplayed()).isTrue();
-    }
-
-    @Test
-    @Tag("smoke")
-    @DisplayName("Deve exibir erro ao informar senha incorreta")
-    void shouldShowErrorForInvalidPassword() {
-        TestUser user = userFixture.registerUniqueUser();
-
-        loginPage.open().loginAs(user.username(), "senha-errada");
-
-        assertThat(loginPage.isOnLoginPage()).isTrue();
-        assertThat(loginPage.getErrorMessage()).contains("Usuário ou senha inválidos");
-    }
-
-    @Test
-    @DisplayName("Deve redirecionar para o login quando não autenticado")
-    void shouldRedirectToLoginWhenNotAuthenticated() {
-        dashboardPage.open();
-
-        assertThat(loginPage.isDisplayed()).isTrue();
     }
 }

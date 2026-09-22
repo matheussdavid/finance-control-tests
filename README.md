@@ -1,88 +1,89 @@
 # finance-control-tests
 
-Automação de testes **E2E** para a aplicação [finance-control](https://github.com/matheussdavid/finance-control) (gerenciador financeiro pessoal — Spring Boot + React + PostgreSQL + JWT).
+Automação de testes para a aplicação [finance-control](https://github.com/matheussdavid/finance-control) (gerenciador financeiro pessoal — Spring Boot + React + PostgreSQL + JWT).
 
-## Objetivo
+## 1. Objetivo
 
-Demonstrar uma suíte de automação profissional com separação clara de responsabilidades:
+Demonstrar uma suíte de testes automatizados simples, clara e profissional, usada por quem está aprendendo automação (QA Jr/Pleno). O projeto cobre:
 
-> **A camada de testes descreve o comportamento validado. A infraestrutura que executa o teste (WebDriver, HTTP, JSON, massa, waits, configuração) vive fora dela.**
+- testes de **API** com Rest Assured;
+- testes **Web** com Selenium + Page Object Model;
+- testes de **contrato** (JSON Schema);
+- **validação de persistência** consultando o PostgreSQL via JDBC;
+- massa de teste dinâmica com **Faker** e **Fixtures** (estado criado via API);
+- execução isolada por grupo e em **CI** (GitHub Actions);
+- evidências de falha (screenshot + diagnóstico).
 
-```
-TESTE (o quê)  →  PageObject/APIClient (como)  →  infra (driver/config/http)
-```
+Arquitetura em uma linha:
 
-Neste repositório você encontra **a infraestrutura completa** e **dois testes-guia de login** (web e api — este último com os testes de contrato JSON Schema no mesmo arquivo) que servem de molde para criar novos testes (veja [AGENTS.md](AGENTS.md)).
+> **TESTE (o quê) → PageObject/APIClient (como) → infra (driver/config/http/db)**
 
-## Stack
+## 2. Tecnologias
 
-| Camada | Tecnologia |
+| Tecnologia | Objetivo |
 |---|---|
-| Linguagem | Java 21 (LTS) |
-| Build | Maven |
-| Testes | JUnit 5 (aggregator), AssertJ |
-| API | REST Assured + JSON Schema (contract) |
-| JSON | Jackson (databind) |
-| Web | Selenium 4 (Selenium Manager resolve o driver sozinho) |
-| Dados | DataFaker (massa dinâmica/única) |
-| Config | dotenv (`env var > .env > default`) |
-| Logs | SLF4J + Logback |
-| CI | GitHub Actions |
+| Java 21 | Linguagem |
+| JUnit 5 | Test runner |
+| Selenium 4 | Testes Web |
+| Rest Assured | Testes de API |
+| JSON Schema (Rest Assured) | Testes de contrato |
+| JDBC | Validação de dados no banco |
+| PostgreSQL | Banco da aplicação sob teste |
+| DataFaker | Massa de teste dinâmica |
+| AssertJ | Asserções |
+| JUnit `@Tag` / `-Dgroups` | Execução isolada por tipo |
+| Maven | Build |
+| Docker Compose | Ambiente da aplicação sob teste |
+| GitHub Actions | CI |
 
-## Arquitetura
+## 3. Arquitetura
+
+Este repositório contém **somente automação** — todo o código vive em `src/test`:
 
 ```
-src/main/java  →  infraestrutura (config, driver, pages, api clients, builders, fixtures, utils)
-src/test/java   →  SOMENTE classes de teste (web, api — contrato é tag dentro do teste de API)
-src/test/resources/schemas  →  contratos JSON Schema (única exceção que mora no test layer)
+src/test
+├── java/br/com/financecontrol
+│   ├── api/            # clients (HTTP), models (respostas), requests (payloads)
+│   ├── builders/       # construção de massa (TestUserBuilder)
+│   ├── config/         # ConfigManager (env > .env > default)
+│   ├── core/           # TestBase, WebTestBase, WebTestWatcher
+│   ├── data/           # TestUser + UserFaker (dados dinâmicos)
+│   ├── database/       # JDBC: DatabaseConnection + repositories
+│   ├── driver/         # DriverFactory (Chrome, headless)
+│   ├── fixtures/       # TestUserFixture, FinanceFixture (pré-condição via API)
+│   ├── tests/          # SOMENTE classes/métodos de teste
+│   │   ├── api/        # LoginApiTest, TransactionPersistenceTest
+│   │   └── web/        # LoginWebTest
+│   └── web/pages/      # Page Objects (LoginPage, DashboardPage, BasePage)
+└── resources
+    ├── schemas/        # contratos JSON Schema
+    ├── logback.xml     # logging (SLF4J)
+    └── junit-platform.properties
 ```
 
-Camadas principais:
+Regras simples:
 
-- **config** — `ConfigManager`: leitura centralizada de `BASE_URL`, `API_BASE_URL`, `BROWSER`, `HEADLESS`, timeouts.
-- **core** — bases de teste (`TestBase`, `WebTestBase`), inicialização do Rest Assured e watcher de evidências.
-- **driver** — `Browser` (enum), `DriverFactory` (options headless/CI-safe) e `DriverManager` (`ThreadLocal` — pronto para paralelismo futuro).
-- **pages** — `BasePage` + Page Objects (`LoginPage`, `DashboardPage`). Locators encapsulados, métodos de comportamento, waits explícitos, **nunca** `Thread.sleep`.
-- **api** — `ClientBase` + `AuthClient` (um método por operação HTTP), `requests` (DTOs de entrada), `models` (DTOs de saída). O teste nunca faz `given()...post()`.
-- **builders/fixtures/data** — massa: `TestUserBuilder`, `TestUserFixture` (registra usuário único via API), `UserFaker` (dados dinâmicos).
-- **utils** — `ScreenshotUtil` (evidência de falha: screenshot + URL + título).
+- infraestrutura e Page Objects ficam em `src/test/java` (não existe `src/main` — não há código de produção);
+- `tests/**` contém **somente** métodos `@Test` — nada de driver/locator/client dentro deles;
+- contratos JSON Schema ficam em `src/test/resources/schemas` e são validados **dentro** da classe de API (`@Tag("contract")`);
+- sem abstrações desnecessárias: client por endpoint, fixture por pré-condição, page por tela usada.
 
-## Estrutura de diretórios
+## 4. Estratégia de testes
 
-```text
-.
-├── .github/workflows/tests.yml        # CI: jobs api (incl. contract) e web
-├── .env.example                       # modelo de configuração (committed)
-├── .env                               # config local (gitignored)
-├── AGENTS.md                          # convenções para estender a suíte
-├── src
-│   ├── main/java/br/com/financecontrol
-│   │   ├── api/{clients, models, requests}
-│   │   ├── builders
-│   │   ├── config
-│   │   ├── core
-│   │   ├── data
-│   │   ├── driver
-│   │   ├── fixtures
-│   │   ├── pages/{components}
-│   │   └── utils
-│   ├── main/resources/logback.xml
-│   └── test
-│       ├── java/br/com/financecontrol/tests/{api, web}
-│       └── resources
-│           ├── junit-platform.properties
-│           └── schemas/{auth, common}
-└── pom.xml
-```
+| Tipo | O que valida | Tags |
+|---|---|---|
+| API | `POST /auth/login` com credenciais válidas → status + token + usuário | `api`, `smoke` |
+| Contract | Resposta de login respeita o JSON Schema em `schemas/auth/login-response.json` | `api`, `contract`, `smoke` |
+| Web | Login via UI → dashboard é exibido | `web`, `smoke` |
+| Database | Despesa criada via API → conferida no PostgreSQL (valor, tipo, data, conta, categoria) | `api` |
 
-## Pré-requisitos
+Massa e fixtures: `TestUserFixture` registra um usuário **único** via API (Faker) e devolve o `TestUser` com id/token; `FinanceFixture` cria conta + categoria para cenários financeiros. Os testes **não** repetem a preparação.
 
-- **Java 21** (LTS) — se tiver JDK mais novo, configure com `maven.compiler.release=21`.
-- **Maven 3.9+**
-- **Docker** — para subir a aplicação sob teste (`finance-control`).
-- **Chrome** — para testes web. Local: Chrome instalado no sistema OU qualquer binário, apontado por `CHROME_BINARY` (veja config). No CI o runner já tem Chrome.
+## 5. Como executar localmente
 
-### Subir a aplicação
+Pré-requisitos: Java 21, Maven 3.9+, Docker, Chrome.
+
+Suba a aplicação sob teste:
 
 ```bash
 cd ../finance-control          # repo do app
@@ -90,72 +91,77 @@ cp .env.example .env           # preencha JWT_SECRET (>= 32 caracteres)
 docker compose up --build -d
 ```
 
-- Frontend: `http://localhost:5173`
-- API: `http://localhost:8080` (Swagger: `/swagger-ui.html`)
+Frontend: `http://localhost:5173` · API: `http://localhost:8080`.
 
-O frontend recebeu um `data-testid` extra (`message-error`) para viabilizar a asserção de erro de login — se você alterar o app, recompile a imagem (`docker compose up --build`).
-
-## Configuração
-
-Precedência: **variável de ambiente → `.env` → padrão no código**. Copie `.env.example` para `.env` e ajuste:
-
-| Chave | Default | Descrição |
-|---|---|---|
-| `BASE_URL` | `http://localhost:5173` | URL do frontend |
-| `API_BASE_URL` | `http://localhost:8080` | URL da API |
-| `BROWSER` | `chrome` | `chrome` / `firefox` / `edge` (estrutura pronta p/ os 2 últimos) |
-| `HEADLESS` | `true` | headless no CI |
-| `CHROME_BINARY` | *(vazio)* | caminho do binário Chrome fora do local padrão |
-| `WAIT_TIMEOUT_SECONDS` | `15` | timeout dos waits explícitos |
-| `DEFAULT_PASSWORD` | `Passw0rd!123` | senha sintética dos usuários de teste (não é secret real) |
-
-Não há secrets reais neste projeto — os usuários/tokens são criados dinamicamente por cada teste. `.env` é gitignored.
-
-## Execução local
+Rode a suíte inteira (api + contract + db + web):
 
 ```bash
-mvn clean test                # tudo (api + contract + web)
+mvn clean test
 ```
 
-## Execução por tipo (profiles = tags JUnit)
+## 6. Como executar por tipo
 
 | Grupo | Comando | O que roda |
 |---|---|---|
-| Tudo | `mvn clean test` | todos os testes |
-| Smoke | `mvn clean test -Psmoke` | `@Tag("smoke")` — caminhos felizes |
-| API | `mvn clean test -Papi` | `@Tag("api")` + `@Tag("contract")` |
-| Web | `mvn clean test -Pweb` | `@Tag("web")` (Selenium) |
-| Contract | `mvn clean test -Pcontract` | `@Tag("contract")` — métodos de JSON Schema dentro de `LoginApiTest` |
-| E2E | `mvn clean test -Pe2e` | `@Tag("e2e")` — fluxos web+api |
+| Tudo | `mvn clean test` | api + contract + db + web |
+| API (+ contract + db) | `mvn clean test -Dgroups=api` | `@Tag("api")` |
+| Contract | `mvn clean test -Dgroups=contract` | `@Tag("contract")` |
+| Web | `mvn clean test -Dgroups=web` | `@Tag("web")` (Selenium) |
+| Smoke | `mvn clean test -Dgroups=smoke` | `@Tag("smoke")` — caminhos felizes |
 
 Teste único:
 
 ```bash
 mvn test -Dtest=LoginApiTest
-mvn test -Dtest="LoginApiTest#shouldRejectInvalidPassword"
+mvn test -Dtest="LoginApiTest#shouldLoginWithValidUsername"
 ```
 
-## GitHub Actions
+Web headless: definido por `HEADLESS=true` (padrão). Em CI nunca muda.
+
+## 7. Configuração
+
+Precedência: **variável de ambiente → `.env` → padrão no código**. Copie `.env.example` para `.env` se quiser ajustar (`.env` é gitignored).
+
+| Chave | Default | Descrição |
+|---|---|---|
+| `BASE_URL` | `http://localhost:5173` | URL do frontend |
+| `API_BASE_URL` | `http://localhost:8080` | URL da API |
+| `DB_URL` / `DB_USER` / `DB_PASSWORD` | `jdbc:postgresql://localhost:5432/finance_control` / `finance` / `finance_pass` | Banco (validação de persistência) |
+| `HEADLESS` | `true` | Chrome headless |
+| `CHROME_BINARY` | *(vazio)* | Binário do Chrome fora do local padrão |
+| `WAIT_TIMEOUT_SECONDS` | `15` | Timeout dos waits explícitos |
+| `SCREENSHOT_DIR` | `target/screenshots` | Evidências de falha visual |
+| `DEFAULT_PASSWORD` | `Passw0rd!123` | Senha sintética dos usuários criados em teste |
+
+Não existem secrets reais: usuários e tokens são criados dinamicamente a cada teste.
+
+## 8. CI
 
 `.github/workflows/tests.yml`:
 
-1. **Job `api`** — checkout dos dois repositórios (testes + app `finance-control`) → JDK 21 (cache maven) → `docker compose up --build` → aguarda API → `mvn clean test -Papi` → upload de reports.
-2. **Job `web`** (após `api`) — mesmo setup → `mvn clean test -Pweb` → upload de reports + **evidências** (`target/screenshots`) → `docker compose down -v`.
+1. **Job `api` (API + Contract + DB)** — checkout dos dois repositórios (testes + app) → JDK 21 (cache Maven) → `docker compose up --build` → aguarda a API responder → `mvn clean test -Dgroups=api` → upload de reports.
+2. **Job `web`** (após `api`) — mesmo setup → `mvn clean test -Dgroups=web` → upload de reports + evidências (`target/screenshots`) → `docker compose down -v`.
 
 Executa em `push`/`PR` para `main` e manualmente (`workflow_dispatch`).
 
-> Se o repositório do app for **privado**, crie um PAT com acesso a ele e configure o secret `APP_REPO_TOKEN` neste repo. A URL do app é ajustável no `repository:` do step "Checkout (app repo)".
+> Se o repositório do app for privado, crie um PAT e configure o secret `APP_REPO_TOKEN` (o app é ajustável no step "Checkout (app repo)").
 
-## Relatórios
+## 9. Evidências e relatórios
 
-- **Por execução** (definitivo): `target/surefire-reports/*.txt|xml` — resultados, duração, stack trace.
-- **HTML**: `mvn surefire-report:report` → `target/site/surefire-report.html`.
-- **Evidências web**: em falha, `WebTestWatcher` salva screenshot + URL + título em `target/screenshots/` (anexado ao CI).
-- **Logs**: `target/logs/test-execution.log` (sem senhas/tokens).
+- Em falha de teste Web, `WebTestWatcher` salva **screenshot + URL + título** em `target/screenshots/` (vira artefato no CI).
+- Resultados por execução: `target/surefire-reports/*.txt|xml`.
+- Relatório HTML: `mvn surefire-report:report` → `target/site/surefire-report.html`.
+- Logs: `target/logs/test-execution.log` (sem senhas/tokens).
 
-## Exemplos guia (leia para aprender)
+## 10. Test coverage
 
-1. **API** — `tests/api/LoginApiTest.java`: `fixture` cria usuário, `client` faz a chamada, teste só monta Arrange/Act/Assert. Os métodos `@Tag("contract")` validam JSON Schema (`src/test/resources/schemas/`) no mesmo arquivo.
-2. **Web** — `tests/web/LoginWebTest.java`: estado criado por API, interação nos Page Objects, teste não conhece locator/driver.
+Aplicação sob teste (Finance Control) — fluxos automatizados neste repositório:
 
-Para criar o próximo recurso (ex.: contas), siga o passo a passo em [AGENTS.md](AGENTS.md).
+| Fluxo | Tipo | Teste |
+|---|---|---|
+| Login com credenciais válidas (via API) | API | `LoginApiTest#shouldLoginWithValidUsername` |
+| Formato da resposta de login | Contract | `LoginApiTest#shouldMatchLoginResponseSchema` |
+| Login pela interface → dashboard | Web | `LoginWebTest#shouldLoginSuccessfully` |
+| Despesa via API → confirmada no PostgreSQL | Database | `TransactionPersistenceTest#shouldPersistExpenseCreatedViaApi` |
+
+**1 exemplo funcional por tipo**, intencionalmente pequeno para servir de molde a novos fluxos.

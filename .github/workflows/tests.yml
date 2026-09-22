@@ -24,7 +24,7 @@ env:
 
 jobs:
   api:
-    name: API + Contract
+    name: API + Contract + DB
     runs-on: ubuntu-latest
     steps:
       - name: Checkout (test repo)
@@ -62,10 +62,10 @@ jobs:
           docker compose logs --tail 40
           exit 1
 
-      - name: Run API and Contract tests
-        run: mvn clean test -Papi --batch-mode
+      - name: Run API, Contract and DB tests
+        run: mvn clean test -Dgroups=api --batch-mode
 
-      - name: Upload reports (API)
+      - name: Upload reports (API + Contract + DB)
         if: always()
         uses: actions/upload-artifact@v7
         with:
@@ -122,7 +122,7 @@ jobs:
       # Chrome já vem instalado no runner ubuntu-latest; o Selenium Manager
       # resolve o chromedriver automaticamente.
       - name: Run Web tests
-        run: mvn clean test -Pweb --batch-mode
+        run: mvn clean test -Dgroups=web --batch-mode
 
       - name: Upload reports + evidence (Web)
         if: always()

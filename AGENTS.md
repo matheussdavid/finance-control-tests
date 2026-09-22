@@ -4,10 +4,10 @@ Guia de convenções para estender esta suíte. Mantenha-o atualizado.
 
 ## Regra de ouro
 
-`src/test/java` contém **somente classes de teste** (métodos `@Test`). Toda infraestrutura vive em `src/main/java`.
+Todo o código da suíte vive em `src/test/java` (não existe `src/main` — é um projeto só de automação). `tests/**` contém **somente** classes de teste (métodos `@Test`); PageObject, API Client, Fixture, Builder, Repository, driver e config vivem fora de `tests/**`.
 
 ```
-TESTE (o quê)  →  PageObject/APIClient (como)  →  infra (driver/config/http)
+TESTE (o quê)  →  PageObject/APIClient (como)  →  infra (driver/config/http/db)
 ```
 
 ## Como criar um novo teste de API
@@ -19,30 +19,40 @@ TESTE (o quê)  →  PageObject/APIClient (como)  →  infra (driver/config/http
 5. `fixtures/XxxFixture.java` — cria estado pré-condição via API (idempotente, dados únicos).
 6. `builders`/`fixtures` **nunca** contêm asserts de negócio — só falham em pré-condição.
 7. `tests/api/XxxApiTest.java` — `@Tag("api")` na classe, `@Tag("smoke")` no happy path. Methods `should...` (AAA).
-8. Contrato (JSON Schema) é `@Tag("contract")` em método **dentro da própria** classe de API — nunca classe/diretório `contract` separado.
+8. Contrato (JSON Schema) é `@Tag("contract")` em método **dentro da própria** classe de API — nunca classe/diretório `contract` separado. Schema em `src/test/resources/schemas`.
 
 ## Como criar um novo teste web
 
 1. Inspecionar o app e usar os `data-testid` existentes (não XPath frágil).
-2. `pages/XxxPage.java` — estende `BasePage`; locators `By` privados; métodos fluent orientados a comportamento; waits explícitos, nunca `Thread.sleep`.
-3. Componentes reutilizados → `pages/components/`.
+2. `web/pages/XxxPage.java` — estende `BasePage`; locators `By` privados; métodos fluent orientados a comportamento; waits explícitos, nunca `Thread.sleep`.
+3. Componentes reutilizados → `web/components/`.
 4. `tests/web/XxxWebTest.java` — `@Tag("web")`. Estado criado por API via fixture (login via `TestUserFixture`).
+
+## Como estender o acesso ao banco
+
+1. `database/XxxRepository.java` — um método de consulta (PreparedStatement + record de saída). Sem ORM.
+2. Suporte a novo fluxo persistido: API cria o registro (client/fixture) → repository consulta → teste asserta.
+3. `database/` **não** contém asserts — só retorna os dados consultados.
 
 ## Padrões
 
-- Nomes: `shouldLoginSuccessfully`, `shouldRejectInvalidPassword`. Nada de `test1`.
+- Nomes: `shouldLoginSuccessfully`. Nada de `test1`.
 - AAA: Arrange (fixture/builder) → Act (client/page) → Assert (assertj/junit).
 - Massa: sempre dados dinâmicos/únicos (`UserFaker`), nunca valores fixos em testes.
-- Tags: `api|web|contract|smoke|e2e`. Profiles Maven: `-Psmoke/-Papi/-Pweb/-Pcontract/-Pe2e`.
+- Tags: `api|web|contract|smoke`. Execução isolada por grupo com `-Dgroups` (ex.: `-Dgroups=api`). Só crie um novo grupo se a execução separada for real.
+- Criar abstração apenas se houver duplicação real e leitura melhor: 10 linhas simples > 3 linhas com 5 abstrações.
 - Logging: SLF4J (`LoggerFactory`). Nunca `System.out.println`.
 - Secrets: não existem reais. `.env` gitignored; default seguro no `ConfigManager`; variáveis de ambiente têm precedência.
-- Evitar paralelismo por enquanto; nada de estado global mutável. `DriverManager` usa `ThreadLocal` para isolar o driver.
+- Sem paralelismo por enquanto; nada de estado global mutável.
 
 ## Commands
 
 ```bash
-mvn clean test                 # tudo
-mvn clean test -Papi -Psmoke   # etc.
+mvn clean test                 # tudo (api + contract + db + web)
+mvn clean test -Dgroups=api    # api (+ contract + db)
+mvn clean test -Dgroups=web    # web (Selenium)
+mvn clean test -Dgroups=contract
+mvn clean test -Dgroups=smoke
 mvn surefire-report:report     # html em target/site
 docker compose -f ../finance-control/docker-compose.yml up -d   # sobe o app
 ```

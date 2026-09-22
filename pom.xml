@@ -11,7 +11,7 @@
     <packaging>jar</packaging>
 
     <name>finance-control-tests</name>
-    <description>E2E automation for the Finance Control app (Selenium + Rest Assured + JUnit 5)</description>
+    <description>Automação de testes do Finance Control (Selenium + Rest Assured + JDBC + JUnit 5)</description>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -28,8 +28,6 @@
         <logback.version>1.5.18</logback.version>
         <maven.surefire.version>3.2.5</maven.surefire.version>
         <maven.compiler.version>3.13.0</maven.compiler.version>
-
-        <surefire.groups/>
     </properties>
 
     <dependencies>
@@ -38,11 +36,13 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Testes de API -->
@@ -50,11 +50,13 @@
             <groupId>io.rest-assured</groupId>
             <artifactId>rest-assured</artifactId>
             <version>${rest-assured.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>io.rest-assured</groupId>
             <artifactId>json-schema-validator</artifactId>
             <version>${rest-assured.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Serialização JSON -->
@@ -62,6 +64,7 @@
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
             <version>${jackson.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Selenium / Selenium Manager resolve o driver automaticamente -->
@@ -69,6 +72,7 @@
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Geração de massa / dados dinâmicos -->
@@ -76,6 +80,15 @@
             <groupId>net.datafaker</groupId>
             <artifactId>datafaker</artifactId>
             <version>${datafaker.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Persistência de dados em PostgreSQL -->
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.4</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Carga de .env (sem sobrescrever variáveis de ambiente reais) -->
@@ -83,6 +96,7 @@
             <groupId>io.github.cdimascio</groupId>
             <artifactId>dotenv-java</artifactId>
             <version>${dotenv.version}</version>
+            <scope>test</scope>
         </dependency>
 
         <!-- Logging (nunca System.out.println) -->
@@ -90,11 +104,13 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
             <version>${slf4j.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>${logback.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -114,7 +130,6 @@
                     <includes>
                         <include>**/*Test.java</include>
                     </includes>
-                    <groups>${surefire.groups}</groups>
                 </configuration>
             </plugin>
 
@@ -125,46 +140,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <profiles>
-        <!-- Executa somente os testes marcados com @Tag("smoke") -->
-        <profile>
-            <id>smoke</id>
-            <properties>
-                <surefire.groups>smoke</surefire.groups>
-            </properties>
-        </profile>
-
-        <!-- API + contract -->
-        <profile>
-            <id>api</id>
-            <properties>
-                <surefire.groups>api|contract</surefire.groups>
-            </properties>
-        </profile>
-
-        <!-- Somente testes web -->
-        <profile>
-            <id>web</id>
-            <properties>
-                <surefire.groups>web</surefire.groups>
-            </properties>
-        </profile>
-
-        <!-- Somente testes de contrato -->
-        <profile>
-            <id>contract</id>
-            <properties>
-                <surefire.groups>contract</surefire.groups>
-            </properties>
-        </profile>
-
-        <!-- Fluxos E2E (web + api) -->
-        <profile>
-            <id>e2e</id>
-            <properties>
-                <surefire.groups>e2e</surefire.groups>
-            </properties>
-        </profile>
-    </profiles>
 </project>
