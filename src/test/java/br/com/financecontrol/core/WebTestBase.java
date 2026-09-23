@@ -3,6 +3,7 @@ package br.com.financecontrol.core;
 import br.com.financecontrol.driver.DriverFactory;
 import br.com.financecontrol.web.pages.DashboardPage;
 import br.com.financecontrol.web.pages.LoginPage;
+import br.com.financecontrol.web.pages.RegisterPage;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.openqa.selenium.WebDriver;
@@ -20,11 +21,13 @@ public abstract class WebTestBase extends TestBase {
     protected WebDriver driver;
     protected LoginPage loginPage;
     protected DashboardPage dashboardPage;
+    protected RegisterPage registerPage;
 
     @BeforeEach
     void initDriver() {
         driver = DriverFactory.create();
         loginPage = new LoginPage(driver);
         dashboardPage = new DashboardPage(driver);
+        registerPage = new RegisterPage(driver);
     }
 }

@@ -176,7 +176,7 @@ class RegisterApiTest extends TestBase {
     @Test
     @DisplayName("Cadastro com senha só de espaços retorna 400 VALIDATION_ERROR")
     void deveRetornar400AoTentarCadastrarUmUsuarioComSenhaEConfirmacaoSendoEspacos() {
-        TestUser user = TestUserBuilder.aUser().withPassword(" ").build();
+        TestUser user = TestUserBuilder.aUser().withPassword("        ").build();
         Response response = authClient.register(user.toRegisterRequest());
 
         response.then()

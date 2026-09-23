@@ -158,11 +158,11 @@ Fonte: `frontend/src/pages/LoginPage.tsx`, `frontend/src/hooks/useAuth.tsx`,
 |---|---|---|---|
 | login | User or Email | `login-identifier-input` | `login.identifierRequired` |
 | login | Password | `login-password-input` | `login.passwordRequired`, `login.passwordMin` |
-| register | Name | `login-name-input` | `login.nameRequired`, `login.nameTooShort` (min 2) |
-| register | Username | `login-username-input` | `login.usernameRequired`, `login.usernameTooShort` (min 2) |
-| register | Email | `login-email-input` | `login.emailRequired`, `login.emailInvalid` |
+| register | Name | `register-name-input` | `login.nameRequired`, `login.nameTooShort` (min 2) |
+| register | Username | `register-username-input` | `login.usernameRequired`, `login.usernameTooShort` (min 2) |
+| register | Email | `register-email-input` | `login.emailRequired`, `login.emailInvalid` |
 | register | Password | `login-password-input` | `login.passwordRequired`, `login.passwordMin` (min 8) |
-| register | Confirm Password | `login-confirm-password-input` | `login.confirmPasswordRequired`, `login.passwordMismatch` |
+| register | Confirm Password | `register-confirm-password-input` | `login.confirmPasswordRequired`, `login.passwordMismatch` |
 | ambos | Submit | `login-submit-btn` | — |
 | ambos | Toggle | `login-toggle-mode-btn` | — |
 
@@ -180,8 +180,8 @@ Fonte: `frontend/src/pages/LoginPage.tsx`, `frontend/src/hooks/useAuth.tsx`,
 
 ### data-testids relevantes
 `login-page`, `login-form-wrapper`, `login-form-title`, `login-form`,
-`login-name-input`, `login-username-input`, `login-identifier-input`,
-`login-email-input`, `login-password-input`, `login-confirm-password-input`,
+`register-name-input`, `register-username-input`, `login-identifier-input`,
+`register-email-input`, `login-password-input`, `register-confirm-password-input`,
 `login-submit-btn`, `login-toggle-mode-btn`.
 
 ---

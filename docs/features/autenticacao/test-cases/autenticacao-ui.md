@@ -26,7 +26,7 @@
 |--------|----|--------|------------|------|----|-------|
 | [x]    | CT-001 | Login com credenciais válidas exibe o dashboard | P0 | Positivo | CA-login-ui-feliz | #4 |
 | [x]    | CT-013 | Login com email válido exibe o dashboard | P0 | Positivo | CA-login-ui-feliz | #4 |
-| [ ]    | CT-003 | Identificador em branco exibe validação e não chama a API | P1 | Negativo | CA-id-branco | #2 |
+| [x]    | CT-003 | Identificador em branco exibe validação e não chama a API | P1 | Negativo | CA-id-branco | #2 |
 | [x]    | CT-004 | Senha menor que 8 caracteres exibe validação | P1 | Negativo | CA-senha-min | #2 |
 | [x]    | CT-005 | Credenciais inválidas exibem erro da API e permanecem na página | P1 | Negativo | CA-login-erro-api | #3 |
 
@@ -34,13 +34,13 @@
 
 | Status | CT | Titulo | Prioridade | Tipo | CA | Regra |
 |--------|----|--------|------------|------|----|-------|
-| [ ]    | CT-002 | Cadastro com dados válidos exibe o dashboard | P0 | Positivo | CA-register-ui-feliz | #4 |
-| [ ]    | CT-006 | Campos obrigatórios do cadastro em branco exibem validação | P1 | Negativo | CA-register-campos | #2 |
-| [ ]    | CT-007 | Email inválido no cadastro exibe validação | P1 | Negativo | CA-email-invalido-ui | #2 |
-| [ ]    | CT-008 | Senha e confirmação diferentes exibem validação | P1 | Negativo | CA-mismatch-ui | #2 |
-| [ ]    | CT-009 | Conflito de email/username exibe erro e permanece na página | P1 | Negativo | CA-conflito-ui | #3 |
-| [ ]    | CT-014 | Nome com 1 caractere no register exibe validação (BVA min 2) | P2 | Borda | CA-register-campos | #2 |
-| [ ]    | CT-015 | Username com 1 caractere no register exibe validação (BVA min 2) | P2 | Borda | CA-register-campos | #2 |
+| [x]    | CT-002 | Cadastro com dados válidos exibe o dashboard | P0 | Positivo | CA-register-ui-feliz | #4 |
+| [x]    | CT-006 | Campos obrigatórios do cadastro em branco exibem validação | P1 | Negativo | CA-register-campos | #2 |
+| [x]    | CT-007 | Email inválido no cadastro exibe validação | P1 | Negativo | CA-email-invalido-ui | #2 |
+| [x]    | CT-008 | Senha e confirmação diferentes exibem validação | P1 | Negativo | CA-mismatch-ui | #2 |
+| [x]    | CT-009 | Conflito de email/username exibe erro e permanece na página | P1 | Negativo | CA-conflito-ui | #3 |
+| [x]    | CT-014 | Nome com 1 caractere no register exibe validação (BVA min 2) | P2 | Borda | CA-register-campos | #2 |
+| [x]    | CT-015 | Username com 1 caractere no register exibe validação (BVA min 2) | P2 | Borda | CA-register-campos | #2 |
 
 ### Fluxo e navegação (LoginPage ↔ Dashboard)
 
@@ -136,7 +136,7 @@
 - **Camada:** UI
 - **Pre-condicoes:** tela `/register` (ou toggle)
 - **Passos:**
-  1. Preencher `login-name-input`, `login-username-input`, `login-email-input`, `login-password-input`, `login-confirm-password-input`
+  1. Preencher `register-name-input`, `register-username-input`, `register-email-input`, `login-password-input`, `register-confirm-password-input`
   2. Clicar em `login-submit-btn`
 - **Dados de entrada:** massa faker única (name, username, email, senha, confirmação)
 - **Resultado esperado:** URL `/`; `dashboard-page` visível (login implícito)
@@ -162,7 +162,7 @@
 - **Camada:** UI
 - **Pre-condicoes:** tela `/register`
 - **Passos:**
-  1. Preencher `login-email-input` com "x@" (sem domínio); demais campos corretos
+  1. Preencher `register-email-input` com "x@" (sem domínio); demais campos corretos
   2. Clicar em `login-submit-btn`
 - **Dados de entrada:** email sem domínio
 - **Resultado esperado:** `Message` com `login.emailInvalid`; permanece na página
@@ -201,7 +201,7 @@
 - **Camada:** UI
 - **Pre-condicoes:** tela `/register`
 - **Passos:**
-  1. Preencher `login-name-input` com 1 caractere; demais campos corretos
+  1. Preencher `register-name-input` com 1 caractere; demais campos corretos
   2. Clicar em `login-submit-btn`
 - **Dados de entrada:** name com 1 caractere (mínimo 2 — BVA: min-1)
 - **Resultado esperado:** `Message` com `login.nameTooShort`; permanece na página; nenhuma chamada à API
@@ -214,7 +214,7 @@
 - **Camada:** UI
 - **Pre-condicoes:** tela `/register`
 - **Passos:**
-  1. Preencher `login-username-input` com 1 caractere; demais campos corretos
+  1. Preencher `register-username-input` com 1 caractere; demais campos corretos
   2. Clicar em `login-submit-btn`
 - **Dados de entrada:** username com 1 caractere (mínimo 2 — BVA: min-1)
 - **Resultado esperado:** `Message` com `login.usernameTooShort`; permanece na página; nenhuma chamada à API

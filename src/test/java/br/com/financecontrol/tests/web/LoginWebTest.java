@@ -42,6 +42,16 @@ class LoginWebTest extends WebTestBase {
     }
 
     @Test
+    @DisplayName("Identificador em branco exibe validação e não chama a API")
+    void deveExibirMensagemQuandoIdentificadorEmBranco() {
+        loginPage.open().loginAs("", "123456789");
+
+        assertThat(loginPage.getErrorMessage()).isEqualTo(
+                "Informe seu usuário ou e-mail");
+        assertThat(loginPage.isDisplayed()).isTrue();
+    }
+
+    @Test
     @DisplayName("Senha menor que 8 caracteres exibe validação")
     void deveExibirMensagemQuandoSenhaMenorQue8Caracteres() {
         loginPage.open().loginAs("tester", "1234567");
