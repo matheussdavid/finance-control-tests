@@ -58,4 +58,8 @@ public class LoginPage extends BasePage {
             throw new TimeoutException("Tempo esgotado aguardando resultado do login", e);
         }
     }
+
+    public String getErrorMessage() {
+        return waitVisible(ERROR_MESSAGE).getText();
+    }
 }

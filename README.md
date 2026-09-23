@@ -113,7 +113,7 @@ Teste único:
 
 ```bash
 mvn test -Dtest=LoginApiTest
-mvn test -Dtest="LoginApiTest#shouldLoginWithValidUsername"
+mvn test -Dtest="LoginApiTest#deveAutenticarUsuarioComCredenciaisValidas"
 ```
 
 Web headless: definido por `HEADLESS=true` (padrão). Em CI nunca muda.
@@ -159,9 +159,16 @@ Aplicação sob teste (Finance Control) — fluxos automatizados neste repositó
 
 | Fluxo | Tipo | Teste |
 |---|---|---|
-| Login com credenciais válidas (via API) | API | `LoginApiTest#shouldLoginWithValidUsername` |
-| Formato da resposta de login | Contract | `LoginApiTest#shouldMatchLoginResponseSchema` |
-| Login pela interface → dashboard | Web | `LoginWebTest#shouldLoginSuccessfully` |
-| Despesa via API → confirmada no PostgreSQL | Database | `TransactionPersistenceTest#shouldPersistExpenseCreatedViaApi` |
+| Login com credenciais válidas (via API) | API | `LoginApiTest#deveAutenticarUsuarioComCredenciaisValidas` |
+| Formato da resposta de login | Contract | `LoginApiTest#deveValidarContratoDeSucessoDoLogin` |
+| Login pela interface → dashboard | Web | `LoginWebTest#deveAutenticarUsuarioComCredenciaisValidas` |
+| Despesa via API → confirmada no PostgreSQL | Database | `TransactionPersistenceTest#devePersistirDespesaCriadaViaApi` |
 
 **1 exemplo funcional por tipo**, intencionalmente pequeno para servir de molde a novos fluxos.
+
+## 11. Roadmap de automação
+
+A ordem de automação das features e os casos de teste por feature vivem em `docs/`:
+
+- [docs/plano-automacao.md](docs/plano-automacao.md) — guia geral: ordem por dependência, prioridades P0–P3 e status.
+- `docs/features/<feature>/` — requisitos + casos de teste por feature (gerados pelas skills `test-case-generator`/`test-case-reviewer`, mantidas localmente em `.opencode/skills/` — gitignored).

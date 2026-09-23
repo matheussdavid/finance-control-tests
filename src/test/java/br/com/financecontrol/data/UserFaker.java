@@ -46,4 +46,20 @@ public final class UserFaker {
     public static BigDecimal transactionAmount() {
         return BigDecimal.valueOf(FAKER.number().randomDouble(2, 5, 300));
     }
+
+    /** String com exatamente {@code length} letras minúsculas aleatórias (BVA). */
+    public static String stringOfLength(int length) {
+        if (length < 0) throw new IllegalArgumentException(
+                "length nao pode ser negativa: " + length);
+        return FAKER.regexify("[a-z]{" + length + "}");
+    }
+
+    /** Email com exatamente {@code length} chars, formato válido
+     p/ @Email (BVA do limite). */
+    public static String emailOfLength(int length) {
+        if (length < 8) throw new IllegalArgumentException(
+                "length minima para email valido e 8: " + length);
+        return stringOfLength(length - 7) + "@qa.com";
+    }
+
 }

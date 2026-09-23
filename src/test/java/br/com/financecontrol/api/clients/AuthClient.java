@@ -14,9 +14,23 @@ public class AuthClient extends ClientBase {
                 .post("/auth/login");
     }
 
+    public Response login(Object body) {
+        return request()
+                .body(body)
+                .when()
+                .post("/auth/login");
+    }
+
     public Response register(RegisterRequest request) {
         return request()
                 .body(request)
+                .when()
+                .post("/auth/register");
+    }
+
+    public Response register(Object body) {
+        return request()
+                .body(body)
                 .when()
                 .post("/auth/register");
     }

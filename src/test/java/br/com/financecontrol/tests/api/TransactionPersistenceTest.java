@@ -26,8 +26,8 @@ class TransactionPersistenceTest extends TestBase {
     private final TransactionRepository transactionRepository = new TransactionRepository();
 
     @Test
-    @DisplayName("Despesa criada via API deve persistir no banco com os dados corretos")
-    void shouldPersistExpenseCreatedViaApi() {
+    @DisplayName("Despesa criada via API persiste no PostgreSQL com dados corretos")
+    void devePersistirDespesaCriadaViaApi() {
         FinanceFixture.FinanceContext context = financeFixture.createExpenseContext();
         BigDecimal amount = UserFaker.transactionAmount();
         String description = UserFaker.transactionDescription();

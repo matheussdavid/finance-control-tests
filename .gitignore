@@ -55,3 +55,7 @@ screenshots/
 # --- Logs ---
 logs/
 *.log
+
+# --- Assistente / documentos locais ---
+.opencode/
+teste.md
