@@ -3,11 +3,11 @@
 **Data de geração:** 2026-09-22
 **Autor:** QA Agent
 **Fonte:** docs/features/autenticacao/autenticacao.md
-**Última atualização:** 2026-09-23 (agrupado por página)
+**Última atualização:** 2026-09-23 (15/15 automatizados; agrupado por página)
 
 ## Resumo Executivo
 - **Total de casos de teste:** 15
-- **Executados:** 4/15 (27%)
+- **Executados:** 15/15 (100%)
 - **Distribuição por prioridade:**
   - P0: 3
   - P1: 7
@@ -46,14 +46,14 @@
 
 | Status | CT | Titulo | Prioridade | Tipo | CA | Regra |
 |--------|----|--------|------------|------|----|-------|
-| [ ]    | CT-010 | Usuário autenticado em /login é redirecionado para o dashboard | P2 | Borda | CA-redirect | #5 |
-| [ ]    | CT-011 | Alternar entre login e cadastro navega e limpa o erro | P2 | Borda | CA-toggle | #1 |
+| [x]    | CT-010 | Usuário autenticado em /login é redirecionado para o dashboard | P2 | Borda | CA-redirect | #5 |
+| [x]    | CT-011 | Alternar entre login e cadastro navega e limpa o erro | P2 | Borda | CA-toggle | #1 |
 
 ### Navbar / Dashboard (logout)
 
 | Status | CT | Titulo | Prioridade | Tipo | CA | Regra |
 |--------|----|--------|------------|------|----|-------|
-| [ ]    | CT-012 | Logout na navbar limpa a sessão e redireciona para /login | P2 | Positivo | CA-logout | #6 |
+| [x]    | CT-012 | Logout na navbar limpa a sessão e redireciona para /login | P2 | Positivo | CA-logout | #6 |
 
 ---
 
@@ -100,7 +100,7 @@
 - **Dados de entrada:** identifier vazio
 - **Resultado esperado:** `Message` com `login.identifierRequired`; permanece em `/login`; nenhuma chamada a `/auth/login`
 - **CA:** CA-id-branco - **Regra:** #2
-- **Observacoes:** garantir "sem chamada" por construção (submeter formulário inválido)
+- **Observacoes:** garantir "sem chamada" por construção (submeter formulário inválido). Coberto por `LoginWebTest#deveExibirMensagemQuandoIdentificadorEmBranco`
 
 ### CT-004 - Senha menor que 8 caracteres exibe validação
 - **Prioridade:** P1
@@ -141,7 +141,7 @@
 - **Dados de entrada:** massa faker única (name, username, email, senha, confirmação)
 - **Resultado esperado:** URL `/`; `dashboard-page` visível (login implícito)
 - **CA:** CA-register-ui-feliz - **Regra:** #4
-- **Observacoes:** massa via `UserFaker` (nunca fixa). Pendente de automação (criar `RegisterWebTest`).
+- **Observacoes:** massa via `UserFaker` (nunca fixa). Coberto por `RegisterWebTest#deveRegistrarUsuarioComSucessoERedirecionarParaDashboard`
 
 ### CT-006 - Campos obrigatórios do cadastro em branco exibem validação
 - **Prioridade:** P1
@@ -154,7 +154,7 @@
 - **Dados de entrada:** payloads parametrizados (campo vazio)
 - **Resultado esperado:** mensagem da ordem de checagem (nameRequired → usernameRequired → emailRequired → passwordRequired → confirmPasswordRequired); nenhuma chamada à API
 - **CA:** CA-register-campos - **Regra:** #2
-- **Observacoes:** [SUPOSICAO] ordem fixa; pode ser um caso parametrizado
+- **Observacoes:** [SUPOSICAO] ordem fixa; pode ser um caso parametrizado. Coberto por `RegisterWebTest#deveExibirValidacaoQuandoCampoObrigatorioEstiverEmBranco` (parametrizado)
 
 ### CT-007 - Email inválido no cadastro exibe validação
 - **Prioridade:** P1
@@ -167,7 +167,7 @@
 - **Dados de entrada:** email sem domínio
 - **Resultado esperado:** `Message` com `login.emailInvalid`; permanece na página
 - **CA:** CA-email-invalido-ui - **Regra:** #2
-- **Observacoes:** regex client: `/^\S+@\S+\.\S+$/`
+- **Observacoes:** regex client: `/^\S+@\S+\.\S+$/`. Coberto por `RegisterWebTest#deveExibirValidacaoDeEmailInvalidoQuandoFormatoForIncorreto`
 
 ### CT-008 - Senha e confirmação diferentes exibem validação
 - **Prioridade:** P1
@@ -180,7 +180,7 @@
 - **Dados de entrada:** `password` != `confirmPassword`
 - **Resultado esperado:** `Message` com `login.passwordMismatch`; nenhuma chamada à API
 - **CA:** CA-mismatch-ui - **Regra:** #2
-- **Observacoes:** -
+- **Observacoes:** coberto por `RegisterWebTest#deveExibirValidacaoQuandoSenhaEConfirmacaoForemDiferentes`
 
 ### CT-009 - Conflito de email/username exibe erro e permanece na página
 - **Prioridade:** P1
@@ -193,7 +193,7 @@
 - **Dados de entrada:** campo conflitante + demais únicos
 - **Resultado esperado:** `Message` com o 409 da API (pt-BR); permanece na página; não autentica
 - **CA:** CA-conflito-ui - **Regra:** #3
-- **Observacoes:** reutilizar `TestUserFixture`; cobrir as duas variações (username/email) parametrizado
+- **Observacoes:** reutilizar `TestUserFixture`; cobrir as duas variações (username/email) parametrizado. Coberto por `RegisterWebTest#deveExibirValidacaoQuandoUsernameOuEmailJaEstiveremCadastrados`
 
 ### CT-014 - Nome com 1 caractere no register exibe validação (BVA min 2)
 - **Prioridade:** P2
@@ -206,7 +206,7 @@
 - **Dados de entrada:** name com 1 caractere (mínimo 2 — BVA: min-1)
 - **Resultado esperado:** `Message` com `login.nameTooShort`; permanece na página; nenhuma chamada à API
 - **CA:** CA-register-campos - **Regra:** #2
-- **Observacoes:** BVA de máximo não se aplica na UI: `maxLength={50}` bloqueia digitação acima de 50. Validar também 2 caracteres como happy path (dentro do CT-002).
+- **Observacoes:** BVA de máximo não se aplica na UI: `maxLength={50}` bloqueia digitação acima de 50. Validar também 2 caracteres como happy path (dentro do CT-002). Coberto por `RegisterWebTest#deveExibirValidacaoQuandoNomeOuUsernameTiverMenosDeDoisCaracteres` (param "name")
 
 ### CT-015 - Username com 1 caractere no register exibe validação (BVA min 2)
 - **Prioridade:** P2
@@ -219,7 +219,7 @@
 - **Dados de entrada:** username com 1 caractere (mínimo 2 — BVA: min-1)
 - **Resultado esperado:** `Message` com `login.usernameTooShort`; permanece na página; nenhuma chamada à API
 - **CA:** CA-register-campos - **Regra:** #2
-- **Observacoes:** BVA de máximo não se aplica na UI: `maxLength={50}` bloqueia digitação acima de 50.
+- **Observacoes:** BVA de máximo não se aplica na UI: `maxLength={50}` bloqueia digitação acima de 50. Coberto por `RegisterWebTest#deveExibirValidacaoQuandoNomeOuUsernameTiverMenosDeDoisCaracteres` (param "username")
 
 ## Fluxo e navegação (LoginPage ↔ Dashboard)
 
@@ -234,7 +234,7 @@
 - **Dados de entrada:** token de sessão ativo
 - **Resultado esperado:** redirecionado para `/` (`<Navigate to="/" replace/>`)
 - **CA:** CA-redirect - **Regra:** #5
-- **Observacoes:** login via API para popular `localStorage` antes
+- **Observacoes:** login via API para popular `localStorage` antes. Coberto por `LoginWebTest#deveRedirecionarUsuarioAutenticadoAcessandoLoginParaDashboard`
 
 ### CT-011 - Alternar entre login e cadastro navega e limpa o erro
 - **Prioridade:** P2
@@ -248,7 +248,7 @@
 - **Dados de entrada:** -
 - **Resultado esperado:** navegação `/login` ↔ `/register`; erro anterior limpo; campos corretos por modo
 - **CA:** CA-toggle - **Regra:** #1
-- **Observacoes:** -
+- **Observacoes:** coberto por `LoginWebTest#deveLimparErroAoTrocarEntreLoginECadastro`
 
 ## Navbar / Dashboard (logout)
 
@@ -263,6 +263,6 @@
 - **Dados de entrada:** -
 - **Resultado esperado:** token removido do `localStorage`; redirecionado para `/login`; ao tentar acessar rota autenticada, volta para `/login`
 - **CA:** CA-logout - **Regra:** #6
-- **Observacoes:** logout é client-side (sem chamada de backend)
+- **Observacoes:** logout é client-side (sem chamada de backend). Coberto por `LoginWebTest#deveLimparSessaoERedirecionarParaLoginAoFazerLogout`
 
 ---

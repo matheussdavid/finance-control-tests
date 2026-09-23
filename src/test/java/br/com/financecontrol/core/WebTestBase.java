@@ -1,6 +1,7 @@
 package br.com.financecontrol.core;
 
 import br.com.financecontrol.driver.DriverFactory;
+import br.com.financecontrol.web.components.UserMenu;
 import br.com.financecontrol.web.pages.DashboardPage;
 import br.com.financecontrol.web.pages.LoginPage;
 import br.com.financecontrol.web.pages.RegisterPage;
@@ -22,6 +23,7 @@ public abstract class WebTestBase extends TestBase {
     protected LoginPage loginPage;
     protected DashboardPage dashboardPage;
     protected RegisterPage registerPage;
+    protected UserMenu userMenu;
 
     @BeforeEach
     void initDriver() {
@@ -29,5 +31,6 @@ public abstract class WebTestBase extends TestBase {
         loginPage = new LoginPage(driver);
         dashboardPage = new DashboardPage(driver);
         registerPage = new RegisterPage(driver);
+        userMenu = new UserMenu(driver);
     }
 }

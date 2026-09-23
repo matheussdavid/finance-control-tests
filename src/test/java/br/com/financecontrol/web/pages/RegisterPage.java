@@ -17,6 +17,7 @@ public class RegisterPage extends BasePage {
     private static final By CONFIRM_PASSWORD_INPUT = By.cssSelector("[data-testid='register-confirm-password-input']");
     private static final By REGISTER_BTN = By.cssSelector("[data-testid='login-submit-btn']");
     private static final By ERROR_MESSAGE = By.cssSelector("[data-testid='message-error']");
+    private static final By LOGIN_TOGGLE = By.cssSelector("[data-testid='login-toggle-mode-btn']");
 
     public enum RegisterField {
         NAME(NAME_INPUT),
@@ -67,8 +68,13 @@ public class RegisterPage extends BasePage {
         return this;
     }
 
-    public String getErrorMessage() {
-        return waitVisible(ERROR_MESSAGE).getText();
+    public String getErrorMessage() {return waitVisible(ERROR_MESSAGE).getText(); }
+
+    public boolean hasErrorMessage() {return isVisible(ERROR_MESSAGE); }
+
+    public LoginPage goToLogin() {
+        click(LOGIN_TOGGLE);
+        return new LoginPage(driver);
     }
 
     public RegisterPage clearField(RegisterField field){

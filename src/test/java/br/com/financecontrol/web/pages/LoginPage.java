@@ -2,6 +2,7 @@ package br.com.financecontrol.web.pages;
 
 import br.com.financecontrol.config.ConfigManager;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
@@ -19,6 +20,7 @@ public class LoginPage extends BasePage {
     private static final By PASSWORD_INPUT = By.cssSelector("[data-testid='login-password-input']");
     private static final By SUBMIT_BTN = By.cssSelector("[data-testid='login-submit-btn']");
     private static final By ERROR_MESSAGE = By.cssSelector("[data-testid='message-error']");
+    private static final By REGISTER_TOGGLE = By.cssSelector("[data-testid='login-toggle-mode-btn']");
 
     public LoginPage(WebDriver driver) {
         super(driver);
@@ -28,6 +30,34 @@ public class LoginPage extends BasePage {
     public LoginPage open() {
         navigate(ConfigManager.BASE_URL + "/login");
         waitVisible(PAGE);
+        return this;
+    }
+
+    /**
+     * Injeta uma sessão autenticada direto no {@code localStorage} (mesmas
+     * chaves que o app usa em {@code api.ts}). Usado quando o estado de login
+     * vem da API em vez do formulário.
+     */
+    public LoginPage seedStoredSession(String token, String userJson) {
+        navigate(ConfigManager.BASE_URL + "/");
+        JavascriptExecutor js = (JavascriptExecutor) driver;
+        js.executeScript(
+                """
+                localStorage.setItem('finance_control_token', arguments[0]);
+                localStorage.setItem('finance_control_user', arguments[1]);
+                """,
+                token,
+                userJson
+        );
+        return this;
+    }
+
+    /**
+     * Navega para /login de um contexto já autenticado. Não espera o formulário
+     * aparecer: o app redireciona para / no render.
+     */
+    public LoginPage openWhenAlreadyAuthenticated() {
+        navigate(ConfigManager.BASE_URL + "/login");
         return this;
     }
 
@@ -59,7 +89,12 @@ public class LoginPage extends BasePage {
         }
     }
 
-    public String getErrorMessage() {
-        return waitVisible(ERROR_MESSAGE).getText();
+    public String getErrorMessage() {return waitVisible(ERROR_MESSAGE).getText(); }
+
+    public boolean hasErrorMessage() {return isVisible(ERROR_MESSAGE); }
+
+    public RegisterPage goToRegister() {
+        click(REGISTER_TOGGLE);
+        return new RegisterPage(driver);
     }
 }
