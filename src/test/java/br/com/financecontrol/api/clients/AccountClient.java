@@ -22,4 +22,10 @@ public class AccountClient extends ClientBase {
                 .when()
                 .get("/accounts");
     }
+
+    public Response getById(String id) {
+        return request()
+                .when()
+                .get("/accounts/{id}", id);
+    }
 }

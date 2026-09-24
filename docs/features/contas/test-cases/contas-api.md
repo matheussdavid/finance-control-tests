@@ -47,7 +47,7 @@
 |--------|----|--------|------------|------|----|-------|
 | [ ] | CT-011 | Contrato do response de sucesso do GET /accounts/{id} | P0 | Contrato | - | - |
 | [ ] | CT-012 | Contrato do response de erro do GET /accounts/{id} | P0 | Contrato | - | - |
-| [ ] | CT-013 | Buscar conta por id retorna a conta | P1 | Positivo | CA-buscar | #4 |
+| [x] | CT-013 | Buscar conta por id retorna a conta | P1 | Positivo | CA-buscar | #4 |
 | [ ] | CT-014 | Buscar conta inexistente retorna 404 NOT_FOUND | P1 | Negativo | CA-404-inexistente | #4 |
 | [ ] | CT-015 | Buscar conta de outro usuario retorna 404 NOT_FOUND | P1 | Negativo | CA-ownership | #4 |
 

@@ -43,6 +43,14 @@ public final class ConfigManager {
      */
     public static final String DEFAULT_PASSWORD = valueOf("DEFAULT_PASSWORD", "Passw0rd!123");
 
+    /**
+     * Usuário-catálogo dos testes de consulta (SeedFixture): credenciais
+     * determinísticas, criadas via API na primeira execução. Senha sintética,
+     * não herda DEFAULT_PASSWORD — assim mudança de .env não orfana o catálogo.
+     */
+    public static final String SEEDED_ACCOUNT_EMAIL = valueOf("SEEDED_ACCOUNT_EMAIL", "seed.contas@qa.example.com");
+    public static final String SEEDED_ACCOUNT_PASSWORD = valueOf("SEEDED_ACCOUNT_PASSWORD", "SeedContas!123");
+
     private static String valueOf(String key, String defaultValue) {
         String env = System.getenv(key);
         if (env != null) {
