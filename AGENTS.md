@@ -69,6 +69,8 @@ mvn clean test -Dgroups=api    # api (+ contract + db)
 mvn clean test -Dgroups=web    # web (Selenium)
 mvn clean test -Dgroups=contract
 mvn clean test -Dgroups=smoke
-mvn surefire-report:report     # html em target/site
+mvn allure:report                # html Allure em target/site/allure-maven-plugin
+mvn allure:serve                 # abre Allure no browser (report em dir temp)
+mvn surefire-report:report       # html em target/site
 docker compose -f ../finance-control/docker-compose.yml up -d   # sobe o app
 ```

@@ -72,6 +72,7 @@ jobs:
           name: test-reports-api
           path: |
             target/surefire-reports/
+            target/allure-results/
             target/logs/
           retention-days: 14
 
@@ -131,6 +132,7 @@ jobs:
           name: test-reports-web
           path: |
             target/surefire-reports/
+            target/allure-results/
             target/screenshots/
             target/logs/
           retention-days: 14
@@ -139,3 +141,47 @@ jobs:
         if: always()
         working-directory: finance-control
         run: docker compose down -v
+
+  report:
+    name: Allure Report
+    needs: [api, web]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout (test repo)
+        uses: actions/checkout@v7
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v6
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Download results (api)
+        uses: actions/download-artifact@v7
+        with:
+          name: test-reports-api
+          path: api
+
+      - name: Download results (web)
+        uses: actions/download-artifact@v7
+        with:
+          name: test-reports-web
+          path: web
+
+      - name: Merge allure-results
+        run: |
+          mkdir -p target/allure-results
+          cp -a api/allure-results/. target/allure-results/
+          cp -a web/allure-results/. target/allure-results/
+
+      - name: Generate Allure report
+        run: mvn allure:report --batch-mode
+
+      - name: Upload Allure report
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: allure-report
+          path: target/site/allure-maven-plugin/
+          retention-days: 14

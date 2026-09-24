@@ -51,6 +51,7 @@ screenshots/
 *.orig
 *~
 .attach_*
+.allure/
 
 # --- Logs ---
 logs/

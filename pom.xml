@@ -28,6 +28,7 @@
         <logback.version>1.5.18</logback.version>
         <maven.surefire.version>3.2.5</maven.surefire.version>
         <maven.compiler.version>3.13.0</maven.compiler.version>
+        <allure.version>2.35.3</allure.version>
     </properties>
 
     <dependencies>
@@ -42,6 +43,11 @@
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
             <version>${assertj.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.qameta.allure</groupId>
+            <artifactId>allure-jupiter</artifactId>
             <scope>test</scope>
         </dependency>
 
@@ -114,6 +120,18 @@
         </dependency>
     </dependencies>
 
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-bom</artifactId>
+                <version>${allure.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
     <build>
         <plugins>
             <plugin>
@@ -138,6 +156,13 @@
                 <artifactId>maven-surefire-report-plugin</artifactId>
                 <version>${maven.surefire.version}</version>
             </plugin>
+
+            <plugin>
+                <groupId>io.qameta.allure</groupId>
+                <artifactId>allure-maven</artifactId>
+                <version>3.1.0</version>
+            </plugin>
+
         </plugins>
     </build>
 </project>

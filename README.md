@@ -35,6 +35,7 @@ Arquitetura em uma linha:
 | Maven | Build |
 | Docker Compose | Ambiente da aplicação sob teste |
 | GitHub Actions | CI |
+| Allure Report | Relatório visual de execução |
 
 ## 3. Arquitetura
 
@@ -57,6 +58,7 @@ src/test
 │   └── web/pages/      # Page Objects (LoginPage, DashboardPage, BasePage)
 └── resources
     ├── schemas/        # contratos JSON Schema
+    ├── allure.properties # diretório de resultados do Allure
     ├── logback.xml     # logging (SLF4J)
     └── junit-platform.properties
 ```
@@ -141,6 +143,7 @@ Não existem secrets reais: usuários e tokens são criados dinamicamente a cada
 
 1. **Job `api` (API + Contract + DB)** — checkout dos dois repositórios (testes + app) → JDK 21 (cache Maven) → `docker compose up --build` → aguarda a API responder → `mvn clean test -Dgroups=api` → upload de reports.
 2. **Job `web`** (após `api`) — mesmo setup → `mvn clean test -Dgroups=web` → upload de reports + evidências (`target/screenshots`) → `docker compose down -v`.
+3. **Job `report`** (após `api` e `web`) — baixa os `target/allure-results/` de ambos, mescla num único diretório, gera o relatório Allure (`mvn allure:report`) e sobe o HTML como artefato `allure-report`.
 
 Executa em `push`/`PR` para `main` e manualmente (`workflow_dispatch`).
 
@@ -148,9 +151,10 @@ Executa em `push`/`PR` para `main` e manualmente (`workflow_dispatch`).
 
 ## 9. Evidências e relatórios
 
-- Em falha de teste Web, `WebTestWatcher` salva **screenshot + URL + título** em `target/screenshots/` (vira artefato no CI).
-- Resultados por execução: `target/surefire-reports/*.txt|xml`.
-- Relatório HTML: `mvn surefire-report:report` → `target/site/surefire-report.html`.
+- Em falha de teste Web, `WebTestWatcher` salva **screenshot + URL + título** em `target/screenshots/` (vira artefato no CI) e anexa a mesma evidência ao teste no Allure.
+- Resultados por execução: `target/surefire-reports/*.txt|xml` e `target/allure-results/`.
+- **Relatório Allure** (recomendado): `mvn allure:report` → `target/site/allure-maven-plugin/index.html` (ou `mvn allure:serve` para gerar e abrir no browser). Agrupa por `@Tag`, mantém histórico/trends e embute screenshots.
+- Relatório HTML simples: `mvn surefire-report:report` → `target/site/surefire-report.html`.
 - Logs: `target/logs/test-execution.log` (sem senhas/tokens).
 
 ## 10. Test coverage
