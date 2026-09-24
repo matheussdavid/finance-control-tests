@@ -154,6 +154,7 @@ Executa em `push`/`PR` para `main` e manualmente (`workflow_dispatch`).
 - Em falha de teste Web, `WebTestWatcher` salva **screenshot + URL + título** em `target/screenshots/` (vira artefato no CI) e anexa a mesma evidência ao teste no Allure.
 - Resultados por execução: `target/surefire-reports/*.txt|xml` e `target/allure-results/`.
 - **Relatório Allure** (recomendado): `mvn allure:report` → `target/site/allure-maven-plugin/index.html` (ou `mvn allure:serve` para gerar e abrir no browser). Agrupa por `@Tag`, mantém histórico/trends e embute screenshots.
+- Relatório público no CI: [allure-report (GitHub Pages)](https://matheussdavid.github.io/finance-control-tests/) — atualizado a cada push na `main`.
 - Relatório HTML simples: `mvn surefire-report:report` → `target/site/surefire-report.html`.
 - Logs: `target/logs/test-execution.log` (sem senhas/tokens).
 

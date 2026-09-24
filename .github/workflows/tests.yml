@@ -175,6 +175,15 @@ jobs:
           cp -a api/allure-results/. target/allure-results/
           cp -a web/allure-results/. target/allure-results/
 
+      # history.jsonl (trends) sobrevive entre runs via cache do runner
+      - name: Restore/Cache Allure history
+        uses: actions/cache@v4
+        with:
+          path: .allure/history
+          key: allure-history-${{ github.ref_name }}-${{ github.run_number }}
+          restore-keys: |
+            allure-history-${{ github.ref_name }}-
+
       - name: Generate Allure report
         run: mvn allure:report --batch-mode
 
@@ -185,3 +194,37 @@ jobs:
           name: allure-report
           path: target/site/allure-maven-plugin/
           retention-days: 14
+
+  deploy:
+    name: Deploy Allure on GitHub Pages
+    needs: report
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout (test repo)
+        uses: actions/checkout@v7
+
+      - name: Download Allure report
+        uses: actions/download-artifact@v7
+        with:
+          name: allure-report
+          path: allure-report
+
+      - name: Upload pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
